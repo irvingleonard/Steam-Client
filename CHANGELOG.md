@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.0.1](https://github.com/Garulf/Steam-Client/compare/v6.0.0...v6.0.1) (2026-07-31)
+
+
+### Bug Fixes
+
+* match shortcuts.vdf field names case-insensitively ([#20](https://github.com/Garulf/Steam-Client/issues/20)) ([9b50718](https://github.com/Garulf/Steam-Client/commit/9b50718eac07b65c29773feec6590faf6dbdd396))
+
 ## [6.0.0](https://github.com/Garulf/Steam-Client/compare/v5.0.3...v6.0.0) (2026-07-13)
 
 
