@@ -47,6 +47,24 @@ def test_shortcut_data_defaults():
     assert data.tags == {}
 
 
+def test_shortcut_data_from_vdf_matches_keys_case_insensitively(raw_entry):
+    """Steam writes shortcuts.vdf field names with inconsistent casing."""
+    lowercased = {key.lower(): value for key, value in raw_entry.items()}
+    data = ShortcutData.from_vdf(lowercased)
+    assert data.AppName == "Test Game"
+    assert data.Exe == '"/path/to/game.exe"'
+    assert data.StartDir == "/path/to"
+    assert data.LastPlayTime == 1700000000
+    assert data.tags == {"0": "favorite"}
+
+
+def test_shortcut_data_from_vdf_mixed_casing():
+    data = ShortcutData.from_vdf({"appname": "Lower", "Exe": '"/game"', "ICON": "/icon.png"})
+    assert data.AppName == "Lower"
+    assert data.Exe == '"/game"'
+    assert data.icon == "/icon.png"
+
+
 def test_shortcut_data_tags_default_is_not_shared():
     assert ShortcutData().tags is not ShortcutData().tags
 
@@ -55,6 +73,12 @@ def test_shortcuts_from_vdf(raw_entry):
     data = Shortcuts.from_vdf({"shortcuts": {"0": raw_entry, "1": raw_entry}})
     assert len(data.shortcuts) == 2
     assert all(isinstance(entry, ShortcutData) for entry in data.shortcuts)
+
+
+def test_shortcuts_from_vdf_top_level_key_case_insensitive(raw_entry):
+    data = Shortcuts.from_vdf({"Shortcuts": {"0": raw_entry}})
+    assert len(data.shortcuts) == 1
+    assert data.shortcuts[0].AppName == "Test Game"
 
 
 def test_shortcuts_from_vdf_empty():

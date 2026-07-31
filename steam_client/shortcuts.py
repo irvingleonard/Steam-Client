@@ -29,9 +29,17 @@ class ShortcutData:
 
     @classmethod
     def from_vdf(cls, data: dict[str, Any]) -> ShortcutData:
-        """Builds ShortcutData from a raw shortcuts.vdf entry, ignoring unknown keys."""
-        known_fields = {field.name for field in fields(cls)}
-        return cls(**{key: value for key, value in data.items() if key in known_fields})
+        """
+        Builds ShortcutData from a raw shortcuts.vdf entry, ignoring unknown keys.
+        Steam writes field names with inconsistent casing (e.g. ``appname`` vs
+        ``AppName``), so keys are matched case-insensitively.
+        """
+        known_fields = {field.name.lower(): field.name for field in fields(cls)}
+        return cls(**{
+            known_fields[key.lower()]: value
+            for key, value in data.items()
+            if key.lower() in known_fields
+        })
 
 
 @dataclass
@@ -42,7 +50,14 @@ class Shortcuts:
     @classmethod
     def from_vdf(cls, data: dict[str, Any]) -> Shortcuts:
         """Builds Shortcuts from parsed shortcuts.vdf data."""
-        return cls([ShortcutData.from_vdf(entry) for entry in data['shortcuts'].values()])
+        # The top-level key's casing varies between installs, same as the fields.
+        entries = next(
+            (value for key, value in data.items() if key.lower() == 'shortcuts'),
+            None,
+        )
+        if entries is None:
+            raise KeyError('shortcuts')
+        return cls([ShortcutData.from_vdf(entry) for entry in entries.values()])
 
     @classmethod
     def load(cls, path: Path) -> Shortcuts:
