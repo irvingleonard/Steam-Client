@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.0.2](https://github.com/Garulf/Steam-Client/compare/v6.0.1...v6.0.2) (2026-07-31)
+
+
+### Bug Fixes
+
+* cast URI segments to str so int app ids work ([#19](https://github.com/Garulf/Steam-Client/issues/19)) ([5b65eb6](https://github.com/Garulf/Steam-Client/commit/5b65eb61427abfa9e1c3f43c6094b89924677ea8))
+
 ## [6.0.1](https://github.com/Garulf/Steam-Client/compare/v6.0.0...v6.0.1) (2026-07-31)
 
 
