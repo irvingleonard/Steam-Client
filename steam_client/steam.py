@@ -1,20 +1,49 @@
 from __future__ import annotations
 from pathlib import Path
+from platform import system as platform_system
+
+if platform_system() == "Windows":
+    from winreg import HKEY_LOCAL_MACHINE, OpenKey as winreg_OpenKey, QueryValueEx as winreg_QueryValueEx
 
 from .library import Library
 from .login_users import LoginUser, LoginUsers
-
-WIN_STEAM_PATH = r"c:\Program Files (x86)\Steam"
 
 
 class Steam:
     """Represents the Steam client."""
 
-    def __init__(self, base_path: str | Path = WIN_STEAM_PATH):
-        self.base_path = Path(base_path)
+    KNOWN_LINUX_PATHS = [
+        Path('~/.steam/steam'),
+        Path('~/.local/share/Steam'),
+        Path('~/.var/app/com.valvesoftware.Steam/.steam'),
+        Path('~/snap/steam/common/.local/share/Steam'),
+    ]
+    WINDOWS_REGISTRY_SUBKEY = r'SOFTWARE\WOW6432Node\Valve\Steam'
+
+    def __init__(self, base_path: str|Path|None = None):
+        """
+
+        """
+
+        self._base_path_param = base_path
+        if base_path is not None:
+            self.base_path = Path(base_path)
+        elif platform_system() == "Windows":
+            with winreg_OpenKey(HKEY_LOCAL_MACHINE, self.WINDOWS_REGISTRY_SUBKEY) as hkey:
+                self.base_path = winreg_QueryValueEx(hkey, "InstallPath")[0]
+        elif platform_system() == "Linux":
+            for known_path in self.KNOWN_LINUX_PATHS:
+                known_path = known_path.expanduser().resolve()
+                if known_path.exists():
+                    self.base_path = known_path
+            if not hasattr(self, 'base_path'):
+                raise RuntimeError('Steam client not found on this Linux system.')
+        else:
+            raise NotImplementedError(f'Automatic Steam Client detection in {platform_system()} is not supported.')
 
     def __repr__(self) -> str:
-        return f'Steam(base_path={str(self.base_path)!r})'
+        """Returns the a python valid string to rebuild the current instance."""
+        return f'{type(self).__name__}(base_path={repr(self._base_path_param)})'
 
     @property
     def app_cache(self) -> Path:
