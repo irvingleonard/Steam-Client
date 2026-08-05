@@ -56,6 +56,8 @@ def _load_asset_manifest(library_cache_path: Path) -> dict[str, dict[str, str]]:
 class Game(App):
     """Represents a Steam game."""
 
+    LIBRARY_INSTALL_SUBDIR = 'common'
+
     def __init__(self, library_cache_path: Path, library_path: str, appid: str):
         self._library_cache_path = Path(library_cache_path)
         self.library_path = library_path
@@ -91,7 +93,7 @@ class Game(App):
     @cached_property
     def install_path(self):
         """Returns the path to the game's install directory."""
-        return Path(self.library_path) / 'common' / self._manifest['AppState']['installdir']
+        return self.manifest_path.parent / self.LIBRARY_INSTALL_SUBDIR / self._manifest['AppState']['installdir']
 
     @cached_property
     def header(self) -> Path | None:
