@@ -89,6 +89,11 @@ class Game(App):
         return self._manifest_asset(_ICON_FIELD)
 
     @cached_property
+    def install_path(self):
+        """Returns the path to the game's install directory."""
+        return Path(self.library_path) / 'common' / self._manifest['AppState']['installdir']
+
+    @cached_property
     def header(self) -> Path | None:
         """Returns the path to the header image."""
         return self._manifest_asset(_HEADER_FIELD)
