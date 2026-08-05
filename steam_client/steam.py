@@ -18,6 +18,7 @@ class Steam:
         Path('~/.var/app/com.valvesoftware.Steam/.steam'),
         Path('~/snap/steam/common/.local/share/Steam'),
     ]
+    MACOS_PATH = Path('~/Library/Application Support/Steam')
     WINDOWS_REGISTRY_SUBKEY = r'SOFTWARE\WOW6432Node\Valve\Steam'
 
     def __init__(self, base_path: str|Path|None = None):
@@ -26,12 +27,19 @@ class Steam:
         """
 
         self._base_path_param = base_path
+        platform_system_ = platform_system()
         if base_path is not None:
             self.base_path = Path(base_path)
-        elif platform_system() == "Windows":
+        elif platform_system_ == "Windows":
             with winreg_OpenKey(HKEY_LOCAL_MACHINE, self.WINDOWS_REGISTRY_SUBKEY) as hkey:
                 self.base_path = winreg_QueryValueEx(hkey, "InstallPath")[0]
-        elif platform_system() == "Linux":
+        elif platform_system_ == "Darwin":
+            macos_path = self.MACOS_PATH.expanduser().resolve()
+            if macos_path.is_dir():
+                self.base_path = macos_path
+            else:
+                raise RuntimeError('Steam client not found on this macOS system.')
+        elif platform_system_ == "Linux":
             for known_path in self.KNOWN_LINUX_PATHS:
                 known_path = known_path.expanduser().resolve()
                 if known_path.exists():
