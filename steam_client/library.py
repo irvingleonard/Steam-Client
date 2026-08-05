@@ -73,3 +73,7 @@ class Library:
         """Yields all the games and shortcuts from the Steam library."""
         yield from self.games()
         yield from self.shortcuts()
+
+    def named_apps(self):
+        """Returns a dictionary with the Steam apps stored in the Steam library keyed by name."""
+        return {app.name: app for app in self.all_apps()}
