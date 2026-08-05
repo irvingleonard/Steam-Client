@@ -27,19 +27,19 @@ class Steam:
         """
 
         self._base_path_param = base_path
-        platform_system_ = platform_system()
+        current_platform_system = platform_system()
         if base_path is not None:
             self.base_path = Path(base_path)
-        elif platform_system_ == "Windows":
+        elif current_platform_system == "Windows":
             with winreg_OpenKey(HKEY_LOCAL_MACHINE, self.WINDOWS_REGISTRY_SUBKEY) as hkey:
                 self.base_path = Path(winreg_QueryValueEx(hkey, "InstallPath")[0])
-        elif platform_system_ == "Darwin":
+        elif current_platform_system == "Darwin":
             macos_path = self.MACOS_PATH.expanduser().resolve()
             if macos_path.is_dir():
                 self.base_path = macos_path
             else:
                 raise RuntimeError('Steam client not found on this macOS system.')
-        elif platform_system_ == "Linux":
+        elif current_platform_system == "Linux":
             for known_path in self.KNOWN_LINUX_PATHS:
                 known_path = known_path.expanduser().resolve()
                 if known_path.exists():
@@ -47,10 +47,10 @@ class Steam:
             if not hasattr(self, 'base_path'):
                 raise RuntimeError('Steam client not found on this Linux system.')
         else:
-            raise NotImplementedError(f'Automatic Steam Client detection in {platform_system()} is not supported.')
+            raise NotImplementedError(f'Automatic Steam client detection in {current_platform_system} is not supported.')
 
     def __repr__(self) -> str:
-        """Returns the a python valid string to rebuild the current instance."""
+        """Returns an eval ready python string to rebuild the current instance."""
         return f'{type(self).__name__}(base_path={repr(self._base_path_param)})'
 
     @property

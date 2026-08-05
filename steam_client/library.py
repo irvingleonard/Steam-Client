@@ -75,9 +75,9 @@ class Library:
         yield from self.shortcuts()
 
     def all_apps_dict(self):
-        """Returns a dictionary with the Steam apps stored in the Steam library keyed by ID."""
+        """Returns a dictionary with the Steam apps stored in the Steam library indexed by ID."""
         return {app.appid: app for app in self.all_apps()}
 
     def named_apps(self):
-        """Returns a dictionary with the Steam apps stored in the Steam library keyed by name."""
+        """Returns a dictionary with the Steam apps stored in the Steam library indexed by name."""
         return {app.name: app for app in self.all_apps()}
