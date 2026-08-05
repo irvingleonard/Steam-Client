@@ -32,7 +32,7 @@ class Steam:
             self.base_path = Path(base_path)
         elif platform_system_ == "Windows":
             with winreg_OpenKey(HKEY_LOCAL_MACHINE, self.WINDOWS_REGISTRY_SUBKEY) as hkey:
-                self.base_path = winreg_QueryValueEx(hkey, "InstallPath")[0]
+                self.base_path = Path(winreg_QueryValueEx(hkey, "InstallPath")[0])
         elif platform_system_ == "Darwin":
             macos_path = self.MACOS_PATH.expanduser().resolve()
             if macos_path.is_dir():
