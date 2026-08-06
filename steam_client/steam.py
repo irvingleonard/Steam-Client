@@ -23,7 +23,7 @@ class Steam:
     MACOS_PATH = Path('~/Library/Application Support/Steam')
     WINDOWS_REGISTRY_SUBKEY = r'SOFTWARE\WOW6432Node\Valve\Steam'
 
-    def __init__(self, base_path: str|Path|None = None):
+    def __init__(self, base_path: str|Path|None = WIN_STEAM_PATH):
         """Magic initialization
         Base path autodetection logic, in case it's not provided."""
         self._base_path_param = base_path
