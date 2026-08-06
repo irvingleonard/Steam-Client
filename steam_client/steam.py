@@ -8,6 +8,8 @@ if platform_system() == "Windows":
 from .library import Library
 from .login_users import LoginUser, LoginUsers
 
+WIN_STEAM_PATH = r"c:\Program Files (x86)\Steam"
+
 
 class Steam:
     """Represents the Steam client."""
