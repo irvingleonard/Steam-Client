@@ -46,15 +46,15 @@ class Steam:
         """Automatically detects the Steam base path."""
         current_platform_system = platform_system()
         if current_platform_system == "Windows":
-            with winreg_OpenKey(HKEY_LOCAL_MACHINE, self.WINDOWS_REGISTRY_SUBKEY) as hkey:
+            with winreg_OpenKey(HKEY_LOCAL_MACHINE, cls.WINDOWS_REGISTRY_SUBKEY) as hkey:
                 return Path(winreg_QueryValueEx(hkey, "InstallPath")[0])
         elif current_platform_system == "Darwin":
-            macos_path = self.MACOS_PATH.expanduser().resolve()
+            macos_path = cls.MACOS_PATH.expanduser().resolve()
             if macos_path.is_dir():
                 return macos_path
             raise RuntimeError('Steam client not found on this macOS system.')
         elif current_platform_system == "Linux":
-            for known_path in self.KNOWN_LINUX_PATHS:
+            for known_path in cls.KNOWN_LINUX_PATHS:
                 known_path = known_path.expanduser().resolve()
                 if known_path.is_dir():
                     return known_path
