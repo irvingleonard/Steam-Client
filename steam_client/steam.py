@@ -27,27 +27,10 @@ class Steam:
         """Magic initialization
         Base path autodetection logic, in case it's not provided."""
         self._base_path_param = base_path
-        current_platform_system = platform_system()
-        if base_path is not None:
-            self.base_path = Path(base_path)
-        elif current_platform_system == "Windows":
-            with winreg_OpenKey(HKEY_LOCAL_MACHINE, self.WINDOWS_REGISTRY_SUBKEY) as hkey:
-                self.base_path = Path(winreg_QueryValueEx(hkey, "InstallPath")[0])
-        elif current_platform_system == "Darwin":
-            macos_path = self.MACOS_PATH.expanduser().resolve()
-            if macos_path.is_dir():
-                self.base_path = macos_path
-            else:
-                raise RuntimeError('Steam client not found on this macOS system.')
-        elif current_platform_system == "Linux":
-            for known_path in self.KNOWN_LINUX_PATHS:
-                known_path = known_path.expanduser().resolve()
-                if known_path.exists():
-                    self.base_path = known_path
-            if not hasattr(self, 'base_path'):
-                raise RuntimeError('Steam client not found on this Linux system.')
+        if base_path is None:
+            self.base_path = self.base_path_auto_detection()
         else:
-            raise NotImplementedError(f'Automatic Steam client detection in {current_platform_system} is not supported.')
+            self.base_path = Path(base_path)
 
     def __repr__(self) -> str:
         """Returns an eval ready python string to rebuild the current instance."""
@@ -57,6 +40,27 @@ class Steam:
     def app_cache(self) -> Path:
         """Returns the path to the appcache folder."""
         return self.base_path / 'appcache'
+
+    @classmethod
+    def base_path_auto_detection(cls):
+        """Automatically detects the Steam base path."""
+        current_platform_system = platform_system()
+        if current_platform_system == "Windows":
+            with winreg_OpenKey(HKEY_LOCAL_MACHINE, self.WINDOWS_REGISTRY_SUBKEY) as hkey:
+                return Path(winreg_QueryValueEx(hkey, "InstallPath")[0])
+        elif current_platform_system == "Darwin":
+            macos_path = self.MACOS_PATH.expanduser().resolve()
+            if macos_path.is_dir():
+                return macos_path
+            raise RuntimeError('Steam client not found on this macOS system.')
+        elif current_platform_system == "Linux":
+            for known_path in self.KNOWN_LINUX_PATHS:
+                known_path = known_path.expanduser().resolve()
+                if known_path.is_dir():
+                    return known_path
+            raise RuntimeError('Steam client not found on this Linux system.')
+        else:
+            raise NotImplementedError(f'Automatic Steam client detection in {current_platform_system} is not supported.')
 
     @property
     def user_data(self) -> Path:
